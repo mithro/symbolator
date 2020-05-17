@@ -574,7 +574,7 @@ def main():
       if source == '<stdin>':
         fname = args.output
       else:
-        fname = os.path.splitext(os.path.basename(source))[0]+'.'+args.format
+        fname = args.input.rsplit('.', 1)[0]+'.'+args.format
         if args.output:
           fname = os.path.join(args.output, fname)
       assert not os.path.exists(fname), fname
