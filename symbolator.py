@@ -486,29 +486,6 @@ def main():
   vhdl_ex = vhdl.VhdlExtractor()
   vlog_ex = vlog.VerilogExtractor()
 
-  if os.path.isfile(args.lib_dirs[0]):
-    # This is a file containing previously parsed array type names
-    vhdl_ex.load_array_types(args.lib_dirs[0])
-
-  else: # args.lib_dirs is a path
-    # Find all library files
-    flist = []
-    for lib in args.lib_dirs:
-      print('Scanning library:', lib)
-      flist.extend(file_search(lib, extensions=('.vhdl', '.vhd', '.vlog', '.v'))) # Get VHDL and Verilog files
-    if args.input and os.path.isfile(args.input):
-      flist.append(args.input)
-
-    # Find all of the array types
-    vhdl_ex.register_array_types_from_sources(flist)
-
-    #print('## ARRAYS:', vhdl_ex.array_types)
-
-  if args.save_lib:
-    print('Saving type defs to "{}".'.format(args.save_lib))
-    vhdl_ex.save_array_types(args.save_lib)
-
-
   if args.input is None:
     sys.exit(0)
 
@@ -525,19 +502,6 @@ def main():
       all_components = {args.input: [(c, vhdl_ex) for c in vhdl_ex.extract_objects(args.input, VhdlComponent)]}
     else:
       all_components = {args.input: [(c, vlog_ex) for c in vlog_ex.extract_objects(args.input)]}
-    # Output is a directory
-
-  elif os.path.isdir(args.input):
-    flist = set(file_search(args.input, extensions=('.vhdl', '.vhd', '.vlog', '.v')))
-
-    # Separate file by extension
-    vhdl_files = set(f for f in flist if vhdl.is_vhdl(f))
-    vlog_files = flist - vhdl_files
-
-    all_components = {f: [(c, vhdl_ex) for c in vhdl_ex.extract_objects(f, VhdlComponent)] for f in vhdl_files}
-
-    vlog_components = {f: [(c, vlog_ex) for c in vlog_ex.extract_objects(f)] for f in vlog_files}
-    all_components.update(vlog_components)
     # Output is a directory
 
   else:
@@ -578,7 +542,7 @@ def main():
         if args.output:
           fname = os.path.join(args.output, fname)
       assert not os.path.exists(fname), fname
-      print('Creating symbol for {} "{}"\n\t-> {}'.format(source, comp.name, fname))
+      print('Creating symbol for {} "{}" -> {}'.format(source, comp.name, fname))
       if args.format == 'svg':
         surf = SvgSurface(fname, style, padding=5, scale=args.scale)
       else:
