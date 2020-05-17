@@ -1,1 +1,1 @@
-from nucanvas import *
+from .nucanvas import *

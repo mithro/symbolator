@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Copyright © 2017 Kevin Thibedeau
 # Distributed under the terms of the MIT license
-from __future__ import print_function
+
 
 import sys, copy, re, argparse, os, errno
 
@@ -458,7 +458,7 @@ def reformat_array_params(vo):
   '''Convert array ranges to Verilog style'''
   for p in vo.ports:
     # Replace VHDL downto and to
-    data_type = p.data_type.replace(' downto ', ':').replace(' to ', u'\u2799')
+    data_type = p.data_type.replace(' downto ', ':').replace(' to ', '\u2799')
     # Convert to Verilog style array syntax
     data_type = re.sub(r'([^(]+)\((.*)\)$', r'\1[\2]', data_type)
 
@@ -561,7 +561,7 @@ def main():
     (0,0), 'auto', None)
 
   # Render every component from every file into an image
-  for source, components in all_components.iteritems():
+  for source, components in all_components.items():
     for comp, extractor in components:
       comp.name = comp.name.strip('_')
       reformat_array_params(comp)

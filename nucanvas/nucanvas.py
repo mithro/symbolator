@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 # Copyright © 2017 Kevin Thibedeau
 # Distributed under the terms of the MIT license
-from __future__ import print_function
 
-from shapes import GroupShape, DrawStyle
+
+from .shapes import GroupShape, DrawStyle
 
 
 class NuCanvas(GroupShape):
@@ -83,9 +83,9 @@ class NuCanvas(GroupShape):
 
 if __name__ == '__main__':
 
-  from svg_backend import SvgSurface
-  from cairo_backend import CairoSurface
-  from shapes import PathShape
+  from .svg_backend import SvgSurface
+  from .cairo_backend import CairoSurface
+  from .shapes import PathShape
 
   #surf = CairoSurface('nc.png', DrawStyle(), padding=5, scale=2)
   surf = SvgSurface('nc.svg', DrawStyle(), padding=5, scale=2)

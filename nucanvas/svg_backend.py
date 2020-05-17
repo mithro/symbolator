@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 # Copyright © 2017 Kevin Thibedeau
 # Distributed under the terms of the MIT license
-from __future__ import print_function
+
 
 import io
 import os
 import math
-import StringIO
+import io
 import xml.etree.ElementTree as ET
 
-from shapes import *
-from cairo_backend import CairoSurface
+from .shapes import *
+from .cairo_backend import CairoSurface
 
 #################################
 ## SVG objects
@@ -54,7 +54,7 @@ class SvgSurface(BaseSurface):
     
     self.fh = None
     
-  svg_header = u'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+  svg_header = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created by Symbolator http://kevinpt.github.io/symbolator -->
 <svg xmlns="http://www.w3.org/2000/svg"
 xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -89,7 +89,7 @@ width="{}" height="{}" viewBox="{}" version="1.1">
     # Reposition all shapes in the viewport
 #    for s in canvas.shapes:
 #      s.move(-x0 + self.padding, -y0 + self.padding)
-    vbox = u' '.join(str(s) for s in (x0-self.padding,y0-self.padding, W,H))
+    vbox = ' '.join(str(s) for s in (x0-self.padding,y0-self.padding, W,H))
 
     # Generate CSS for fonts
     text_color = rgb_to_hex(self.def_styles.text_color)
@@ -119,7 +119,7 @@ width="{}" height="{}" viewBox="{}" version="1.1">
     #print('## FSET:', fv.font_set)
 
     font_css = []
-    for fs, fid in fv.font_set.iteritems():
+    for fs, fid in fv.font_set.items():
       family, size, weight = fs[0]
       text_color = rgb_to_hex(fs[1])
 
@@ -178,15 +178,15 @@ width="{}" height="{}" viewBox="{}" version="1.1">
         'markerUnits': 'strokeWidth' if units == 'stroke' else 'userSpaceOnUse'
       }
 
-      attributes = ' '.join(['{}="{}"'.format(k,v) for k,v in attrs.iteritems()])
+      attributes = ' '.join(['{}="{}"'.format(k,v) for k,v in attrs.items()])
 
-      buf = StringIO.StringIO()
+      buf = io.StringIO()
       self.draw_shape(m_shape, buf)
       # Shift enerything inside a group so that the viewBox origin is 0,0
       svg_shapes = '<g transform="translate({},{})">{}</g>\n'.format(-mx0, -my0, buf.getvalue())
       buf.close()
 
-      markers.append(u'<marker {}>\n{}</marker>'.format(attributes, svg_shapes))
+      markers.append('<marker {}>\n{}</marker>'.format(attributes, svg_shapes))
 
     markers = '\n'.join(markers)
 
@@ -203,10 +203,10 @@ width="{}" height="{}" viewBox="{}" version="1.1">
       fh.write(SvgSurface.svg_header.format(int(W*self.scale),int(H*self.scale),
               vbox, font_styles, markers))
       if not transparent:
-        fh.write(u'<rect x="{}" y="{}" width="100%" height="100%" fill="white"/>'.format(x0-self.padding,y0-self.padding))
+        fh.write('<rect x="{}" y="{}" width="100%" height="100%" fill="white"/>'.format(x0-self.padding,y0-self.padding))
       for s in canvas.shapes:
         self.draw_shape(s)
-      fh.write(u'</svg>')
+      fh.write('</svg>')
 
 
   def text_bbox(self, text, font_params, spacing=0):
@@ -245,11 +245,11 @@ width="{}" height="{}" viewBox="{}" version="1.1">
     if text_color != (0,0,0):
       attrs['style'] = 'fill:{}'.format(rgb_to_hex(text_color))
 
-    attributes = ' '.join(['{}="{}"'.format(k,v) for k,v in attrs.iteritems()])
+    attributes = ' '.join(['{}="{}"'.format(k,v) for k,v in attrs.items()])
 
     text = SvgSurface.convert_pango_markup(text)
 
-    fh.write(u'<text class="{}" x="{}" y="{}" {}>{}</text>\n'.format(css_class, x, y, attributes, text))
+    fh.write('<text class="{}" x="{}" y="{}" {}>{}</text>\n'.format(css_class, x, y, attributes, text))
 
 
   def draw_shape(self, shape, fh=None):
@@ -294,19 +294,19 @@ width="{}" height="{}" viewBox="{}" version="1.1">
     
     # Draw standard shapes
     elif isinstance(shape, GroupShape):
-      tform = [u'translate({},{})'.format(*shape._pos)]
+      tform = ['translate({},{})'.format(*shape._pos)]
       
       if 'scale' in shape.options:
-        tform.append(u'scale({})'.format(shape.options['scale']))
+        tform.append('scale({})'.format(shape.options['scale']))
       if 'angle' in shape.options:
-        tform.append(u'rotate({})'.format(shape.options['angle']))
+        tform.append('rotate({})'.format(shape.options['angle']))
 
-      fh.write(u'<g transform="{}">\n'.format(u' '.join(tform)))
+      fh.write('<g transform="{}">\n'.format(' '.join(tform)))
       
       for s in shape.shapes:
         self.draw_shape(s)
       
-      fh.write(u'</g>\n')
+      fh.write('</g>\n')
 
     elif isinstance(shape, TextShape):
       x0, y0, x1, y1 = shape.points
@@ -375,22 +375,22 @@ width="{}" height="{}" viewBox="{}" version="1.1">
 
       # Add markers
       if marker_start in self.markers:
-        attrs['marker-start'] = u'url(#{})'.format(marker_start)
+        attrs['marker-start'] = 'url(#{})'.format(marker_start)
       if marker_end in self.markers:
-        attrs['marker-end'] = u'url(#{})'.format(marker_end)
+        attrs['marker-end'] = 'url(#{})'.format(marker_end)
       # FIXME: marker_seg
 
-      attributes = ' '.join(['{}="{}"'.format(k,v) for k,v in attrs.iteritems()])
+      attributes = ' '.join(['{}="{}"'.format(k,v) for k,v in attrs.items()])
 
-      fh.write(u'<line x1="{}" y1="{}" x2="{}" y2="{}" {}/>\n'.format(x0,y0, x1,y1, attributes))
+      fh.write('<line x1="{}" y1="{}" x2="{}" y2="{}" {}/>\n'.format(x0,y0, x1,y1, attributes))
 
 
     elif isinstance(shape, RectShape):
       x0, y0, x1, y1 = shape.points
       
-      attributes = ' '.join(['{}="{}"'.format(k,v) for k,v in attrs.iteritems()])
+      attributes = ' '.join(['{}="{}"'.format(k,v) for k,v in attrs.items()])
 
-      fh.write(u'<rect x="{}" y="{}" width="{}" height="{}" {}/>\n'.format(
+      fh.write('<rect x="{}" y="{}" width="{}" height="{}" {}/>\n'.format(
         x0,y0, x1-x0, y1-y0, attributes))
 
     elif isinstance(shape, OvalShape):
@@ -401,8 +401,8 @@ width="{}" height="{}" viewBox="{}" version="1.1">
       h = abs(y1 - y0)
       rad = min(w,h)
       
-      attributes = ' '.join(['{}="{}"'.format(k,v) for k,v in attrs.iteritems()])
-      fh.write(u'<ellipse cx="{}" cy="{}" rx="{}" ry="{}" {}/>\n'.format(xc, yc,
+      attributes = ' '.join(['{}="{}"'.format(k,v) for k,v in attrs.items()])
+      fh.write('<ellipse cx="{}" cy="{}" rx="{}" ry="{}" {}/>\n'.format(xc, yc,
               w/2.0, h/2.0, attributes))
 
 
@@ -435,13 +435,13 @@ width="{}" height="{}" viewBox="{}" version="1.1">
       lflag = 0 if abs(extent) <= 180 else 1
       sflag = 0 if extent >= 0 else 1
 
-      attributes = ' '.join(['{}="{}"'.format(k,v) for k,v in attrs.iteritems()])
+      attributes = ' '.join(['{}="{}"'.format(k,v) for k,v in attrs.items()])
       
 #      fh.write(u'<circle cx="{}" cy="{}" r="6" fill="{}" />\n'.format(xc, yc, rgb_to_hex((255,0,255))))
 #      fh.write(u'<circle cx="{}" cy="{}" r="6" fill="{}" />\n'.format(xs, ys, rgb_to_hex((0,0,255))))
 #      fh.write(u'<circle cx="{}" cy="{}" r="6" fill="{}" />\n'.format(xe, ye, rgb_to_hex((0,255,255))))
 
-      fh.write(u'<path d="M{},{} A{},{} 0, {},{} {},{} {}" {}/>\n'.format(xs,ys, xr,yr, lflag, sflag, xe,ye, closed, attributes))
+      fh.write('<path d="M{},{} A{},{} 0, {},{} {},{} {}" {}/>\n'.format(xs,ys, xr,yr, lflag, sflag, xe,ye, closed, attributes))
 
     elif isinstance(shape, PathShape):
       pp = shape.nodes[0]
@@ -496,6 +496,6 @@ width="{}" height="{}" viewBox="{}" version="1.1">
           
           #print('# pp:', pp)
 
-      attributes = ' '.join(['{}="{}"'.format(k,v) for k,v in attrs.iteritems()])
-      fh.write(u'<path d="{}" {}/>\n'.format(' '.join(nl), attributes))
+      attributes = ' '.join(['{}="{}"'.format(k,v) for k,v in attrs.items()])
+      fh.write('<path d="{}" {}/>\n'.format(' '.join(nl), attributes))
 
