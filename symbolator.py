@@ -58,16 +58,16 @@ class Pin(object):
 
   def draw(self, x, y, c):
     g = c.create_group(x,y)
-    #r = self.bubble_rad
+    r = self.bubble_rad
 
     if self.side == 'l':
       xs = -self.pin_length
-      #bx = -r
+      bx = -r
       #xe = 2*bx if self.bubble else 0
       xe = 0
     else:
       xs = self.pin_length
-      #bx = r
+      bx = r
       #xe = 2*bx if self.bubble else 0
       xe = 0
 
@@ -81,9 +81,9 @@ class Pin(object):
       ls.options['marker_adjust'] = 0.8
 
     if self.bubble:
-      #g.create_oval(bx-r,-r, bx+r, r, fill=(255,255,255))
-      ls.options['marker_end'] = 'bubble'
-      ls.options['marker_adjust'] = 1.0
+      g.create_oval(bx-r,-r, bx+r, r, fill=(255,255,255))
+      #ls.options['marker_end'] = 'bubble'
+      #ls.options['marker_adjust'] = 1.0
 
     if self.clocked: # Draw triangle for clock
       ls.options['marker_end'] = 'clock'
@@ -281,7 +281,7 @@ class HdlSymbol(object):
       if i==0 and self.libname:
         # Add libname
         c.create_text((bb[0]+bb[2])/2.0,bb[1] - self.symbol_spacing, anchor='cs',
-          text=self.libname, font=('Helvetica', 12, 'bold'))
+          text=self.libname, font=('Helvetica', 16, 'bold'))
       elif i == 0 and self.component:
         # Add component name
         c.create_text((bb[0]+bb[2])/2.0,bb[1] - self.symbol_spacing, anchor='cs',
@@ -290,7 +290,7 @@ class HdlSymbol(object):
       yoff += bb[3] - bb[1] + self.symbol_spacing
     if self.libname is not None:
         c.create_text((bb[0]+bb[2])/2.0,bb[3] + 2 * self.symbol_spacing, anchor='cs',
-          text=self.component, font=('Helvetica', 12, 'bold'))
+          text=self.component, font=('Helvetica', 10, ''))
 
 
 
@@ -346,7 +346,9 @@ def make_section(sname, sect_pins, fill, extractor, no_type=False):
 def make_symbol(comp, extractor, title=False, libname="", no_type=False):
   '''Create a symbol from a parsed component/module'''
   if libname != "":
-      vsym = HdlSymbol(comp.name, libname)
+      assert comp.name.startswith(libname)
+      name = comp.name.split('__')[-1]
+      vsym = HdlSymbol(libname, name)
   elif title != False:
       vsym = HdlSymbol(comp.name)
   else:
@@ -469,6 +471,7 @@ def reformat_array_params(vo):
       data_type = '['.join([pieces[0], pieces[1].replace(' ', '')])
 
     p.data_type = data_type
+
 
 def main():
   '''Run symbolator'''
