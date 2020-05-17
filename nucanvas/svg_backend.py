@@ -120,7 +120,7 @@ width="{}" height="{}" viewBox="{}" version="1.1">
 
     font_css = []
     for fs, fid in fv.font_set.items():
-      family, size, weight = fs[0]
+      family, size, weight, *extra = fs[0]
       text_color = rgb_to_hex(fs[1])
 
       if weight == 'italic':
@@ -129,9 +129,22 @@ width="{}" height="{}" viewBox="{}" version="1.1">
       else:
         style = 'normal'
 
-      font_css.append('''.{} {{fill:{};
-    font-family:{}; font-size:{}pt; font-weight:{}; font-style:{};}}'''.format(fid,
-      text_color, family, size, weight, style))
+      s = []
+      s.append('.{}'.format(fid))
+      s.append('{')
+      if text_color:
+        s.append('fill:{};'.format(text_color))
+      if family:
+        s.append('font-family:{};'.format(family))
+      if size:
+        s.append('font-size:{}pt;'.format(size))
+      if weight:
+        s.append('font-weight:{};'.format(weight))
+      if style:
+        s.append('font-style:{};'.format(style))
+      s.extend(extra)
+      s.append('}')
+      font_css.append(' '.join(s))
 
     font_styles = '\n'.join(font_css)
 

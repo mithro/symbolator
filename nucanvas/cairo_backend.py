@@ -32,7 +32,7 @@ def rgb_to_cairo(rgb):
     return (r / 255.0, g / 255.0, b / 255.0, 1.0)
 
 def cairo_font(tk_font):
-  family, size, weight = tk_font
+  family, size, weight, *extra = tk_font
   return pango.FontDescription('{} {} {}'.format(family, weight, size))
 
 

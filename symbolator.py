@@ -3,7 +3,6 @@
 # Copyright © 2017 Kevin Thibedeau
 # Distributed under the terms of the MIT license
 
-
 import sys, copy, re, argparse, os, errno
 
 from nucanvas import DrawStyle, NuCanvas
@@ -89,14 +88,18 @@ class Pin(object):
       ls.options['marker_end'] = 'clock'
       #ls.options['marker_adjust'] = 1.0
 
+    kw = {}
+    if self.bubble:
+      kw['font'] = ('Times', 12, None, 'text-decoration: overline;')
+
     if self.side == 'l':
-      g.create_text(self.padding,0, anchor='w', text=self.styled_text)
+      g.create_text(self.padding,0, anchor='w', text=self.styled_text, **kw)
 
       if self.data_type:
         g.create_text(xs-self.padding, 0, anchor='e', text=self.styled_type, text_color=(150,150,150))
 
     else: # Right side pin
-      g.create_text(-self.padding,0, anchor='e', text=self.styled_text)
+      g.create_text(-self.padding,0, anchor='e', text=self.styled_text, **kw)
 
       if self.data_type:
         g.create_text(xs+self.padding, 0, anchor='w', text=self.styled_type, text_color=(150,150,150))
@@ -212,6 +215,7 @@ class PinSection(object):
 
     return (g, (x, y+top, x+width, y+bot))
 
+
 class Symbol(object):
   '''Symbol composed of sections'''
   def __init__(self, sections=None, line_color=(0,0,0)):
@@ -252,8 +256,8 @@ class Symbol(object):
     # Add symbol outline
     c.create_rectangle(x0,y0,x1,y1, weight=self.line_weight, line_color=self.line_color)
 
-
     return (x0,y0, x1,y1)
+
 
 class HdlSymbol(object):
   '''Top level symbol object'''
@@ -263,8 +267,6 @@ class HdlSymbol(object):
     self.width_steps = width_steps
     self.component = component
     self.libname = libname
-
-
 
   def add_symbol(self, symbol):
     self.symbols.append(symbol)
@@ -334,6 +336,7 @@ def make_section(sname, sect_pins, fill, extractor, no_type=False):
       pin.clocked = True
 
     if pin_patterns['bubble'].search(pname):
+      pin.text = pin.text[:-2]
       pin.bubble = True
 
     if bus or pin_patterns['bus'].search(pname):
