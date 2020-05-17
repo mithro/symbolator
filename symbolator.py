@@ -273,7 +273,10 @@ class HdlSymbol(object):
 
   def draw(self, x, y, c):
     style = c.surf.def_styles
-    sym_width = max(s.min_width(c, style.font) for sym in self.symbols for s in sym.sections)
+    if self.symbols:
+        sym_width = max(s.min_width(c, style.font) for sym in self.symbols for s in sym.sections)
+    else:
+        sym_width = 10
 
     sym_width = (sym_width // self.width_steps + 1) * self.width_steps
 
@@ -290,9 +293,10 @@ class HdlSymbol(object):
           text=self.component, font=('Helvetica', 12, 'bold'))
 
       yoff += bb[3] - bb[1] + self.symbol_spacing
-    if self.libname is not None:
-        c.create_text((bb[0]+bb[2])/2.0,bb[3] + 2 * self.symbol_spacing, anchor='cs',
-          text=self.component, font=('Helvetica', 10, ''))
+    if self.symbols:
+        if self.libname is not None:
+            c.create_text((bb[0]+bb[2])/2.0,bb[3] + 2 * self.symbol_spacing, anchor='cs',
+              text=self.component, font=('Helvetica', 10, ''))
 
 
 
