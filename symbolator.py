@@ -574,13 +574,10 @@ def main():
       if source == '<stdin>':
         fname = args.output
       else:
-        base = os.path.splitext(os.path.basename(source))[0]
-        fname = '{}{}.{}'.format(
-            args.libname + "__" if args.libname is not None else "",
-            comp.name,
-            args.format)
+        fname = os.path.splitext(os.path.basename(source))[0]+'.'+args.format
         if args.output:
           fname = os.path.join(args.output, fname)
+      assert not os.path.exists(fname), fname
       print('Creating symbol for {} "{}"\n\t-> {}'.format(source, comp.name, fname))
       if args.format == 'svg':
         surf = SvgSurface(fname, style, padding=5, scale=args.scale)
