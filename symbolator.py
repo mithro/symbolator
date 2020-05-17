@@ -90,7 +90,7 @@ class Pin(object):
 
     kw = {}
     if self.bubble:
-      kw['font'] = ('Times', 12, None, 'text-decoration: overline;')
+      kw['font'] = ('Helvetica', 12, 'normal', 'text-decoration: overline;')
 
     if self.side == 'l':
       g.create_text(self.padding,0, anchor='w', text=self.styled_text, **kw)
@@ -118,8 +118,8 @@ class PinSection(object):
     self.fill = fill
     self.line_color = line_color
     self.pins = []
-    self.spacing = 20
-    self.padding = 5
+    self.spacing = 22
+    self.padding = 10
     self.show_name = True
 
     self.name = name
@@ -179,7 +179,7 @@ class PinSection(object):
       else:
         rmax = max(rmax, name_width)
 
-    return lmax + rmax + self.padding
+    return lmax + rmax
 
   def draw(self, x, y, width, c):
     dy = self.spacing
@@ -198,7 +198,7 @@ class PinSection(object):
     g.create_rectangle(0,top, width,bot, fill=self.fill, line_color=self.line_color)
 
     if self.show_name and self.name is not None:
-      g.create_text(width / 2.0,0, text=self.name, font=title_font)
+      g.create_text(width / 2.0,-(self.padding/2), text=self.name, font=title_font)
 
 
     lp = self.left_pins
